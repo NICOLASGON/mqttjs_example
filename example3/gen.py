@@ -5,6 +5,9 @@ import random
 import json
 import time
 
+offset = -50
+amplitude = 120
+
 broker="iot.eclipse.org"
 port=1883
 
@@ -17,11 +20,11 @@ point['acc'] = {}
 point['mag'] = {}
 
 while True:
-	point['acc']['x'] = random.random() * 40
-	point['acc']['y'] = random.random() * 40
-	point['acc']['z'] = random.random() * 40
-	point['mag']['x'] = random.random() * 40
-	point['mag']['y'] = random.random() * 40
-	point['mag']['x'] = random.random() * 40
+	point['acc']['x'] = (random.random() * amplitude) + offset
+	point['acc']['y'] = (random.random() * amplitude) + offset
+	point['acc']['z'] = (random.random() * amplitude) + offset
+	point['mag']['x'] = (random.random() * amplitude) + offset
+	point['mag']['y'] = (random.random() * amplitude) + offset
+	point['mag']['z'] = (random.random() * amplitude) + offset
 	client1.publish("testing/", json.dumps(point))
 	time.sleep(0.1)
