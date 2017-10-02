@@ -1,10 +1,10 @@
 var mqtt;
 var reconnectTimeout = 2000;
 
-var host = "archibald.snootlab.info";
-var port = 2523;
+var host = "iot.eclipse.org";
+var port = 80;
 var path = "/ws";
-var topic = "trackers/#";
+var topic = "testing/";
 
 var useTLS = false;
 var username = null;
