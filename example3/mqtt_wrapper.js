@@ -48,6 +48,5 @@ function onMessageArrived(message) {
 	var topic = message.destinationName;
 	var payload = JSON.parse(message.payloadString);
 
-	add3D(accChart, payload.acc);
-	add3D(magChart, payload.mag);
+	updateInterface(payload);
 };
