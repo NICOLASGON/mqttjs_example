@@ -84,14 +84,32 @@
 			</div>
 		</div>
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"></script>
 		<script src="mqtt_wrapper.js"></script>
+		<script src="leaflet.rotatedMarker.js"></script>
 		<script>
+
+			var aircraftIcon = L.icon({
+				iconUrl: 'aircraft.svg',
+				iconSize:     [80, 80],
+			});
+
+			var mymap = L.map('mapid').setView([43.599553, 1.439851], 13);
+			var tracker_marker = L.marker([51.5, -0.09], {icon: aircraftIcon}).addTo(mymap);
+			tracker_marker.setRotationOrigin('center center');
+
+			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+				maxZoom: 25,
+				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				id: 'mapbox.streets'
+			}).addTo(mymap);
 
 			var ctx = document.getElementById("accChart").getContext('2d');
 			var accChart = new Chart(ctx, {
@@ -129,10 +147,10 @@
 							},
 							scaleLabel: {
 								display: true,
-								labelString: 'm.s²'
+								labelString: 'mG'
 							}
 						}]
-					}
+					},
 				}
 			});
 
@@ -201,7 +219,7 @@
 							},
 							scaleLabel: {
 								display: true,
-								labelString: 'uT'
+								labelString: 'km/h'
 							}
 						}]
 					}
@@ -248,23 +266,22 @@
 				}
 				speedChart.update();
 
+				/* Update marker */
+				tracker_marker.setLatLng([ data.GPS.latitude, data.GPS.longitude ]).update();
+				tracker_marker.setRotationAngle(data.mag3110.xy);
+
+				/* Update DOP */
+				$('#HDOP').width( data.GPS.HDOP.toString() * 10 + '%')
+						.text( data.GPS.HDOP.toString() );
+				$('#VDOP').width( data.GPS.VDOP.toString() * 10 + '%')
+						.text( data.GPS.VDOP.toString() );
+				$('#PDOP').width( data.GPS.PDOP.toString() * 10 + '%')
+						.text( data.GPS.PDOP.toString() );
 			}
 
 			$(document).ready(function() {
 				MQTTconnect();
 			});
-
-	var mymap = L.map('mapid').setView([51.505, -0.09], 13);
-
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-		maxZoom: 18,
-		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-			'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-			'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-		id: 'mapbox.streets'
-	}).addTo(mymap);
-
-	L.marker([51.5, -0.09]).addTo(mymap);
 
 		</script>
 	</body>
