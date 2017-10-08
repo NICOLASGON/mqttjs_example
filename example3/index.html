@@ -3,18 +3,44 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>MQTT demo</title>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css">
+	<title>TraC/Ker realtime</title>
+	<link rel="stylesheet" href="static/css/bootstrap.min.css">
+	<link rel="stylesheet" href="static/css/font-awesome.min.css">
+	<link rel="stylesheet" href="static/css/leaflet.css">
+
+	<style>
+		#menu-bar {
+		  padding-top: 2rem;
+		  background-color: rgba(0,0,0,.03)
+		}
+
+		#menu-bar a {
+		  color: #212529;
+		}
+
+		#menu-bar a:hover {
+		  color: #868e96;
+		}
+	</style>
 </head>
 	<body>
 
-		<nav class="navbar navbar-dark bg-dark">
-		  <span class="navbar-text">
-			TraC/Ker Real Time Plotting
-		  </span>
-		</nav>
+		<div class="container-fluid" id="menu-bar">
+			<ul class="nav nav-tabs justify-content-center">
+				<li class="nav-item">
+					<a class="nav-link active" href="index.html">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="magnetometre.html">Magnetomètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="accelerometre.html">Accéléromètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="gps.html">GPS</a>
+				</li>
+			</ul>
+		</div>
 
 		<div class="container-fluid" style="padding-top: 20px;">
 			<div class="row">
@@ -49,23 +75,23 @@
 					</div>
 				</div>
 			</div>
-			<div class="row" style="padding-top: 20px;">
+			<div class="row" style="padding-top: 30px;">
 				<div class="col-6">
 					<div class="card">
 					  <div class="card-header">
 						Cartographie
 					  </div>
 					  <div class="card-body" style="padding: 0;">
-						<div id="mapid" style="width: 100%; height: 300px;"></div>
+						<div id="mapid" style="width: 100%; height: 400px;"></div>
 					  </div>
 					</div>
 				</div>
 				<div class="col-6">
-					<div class="card">
+					<div class="card" style="height: 100%;">
 					  <div class="card-header">
 						Cartographie
 					  </div>
-					  <div class="card-body" style="padding: 20px;">
+					  <div class="card-body" style="padding: 30px;">
 						<h5>HDOP :</h5>
 						<div class="progress">
 						  <div id="HDOP" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="2" aria-valuemin="0" aria-valuemax="10"></div>
@@ -84,18 +110,18 @@
 			</div>
 		</div>
 
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
-		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js"></script>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"></script>
-		<script src="mqtt_wrapper.js"></script>
-		<script src="leaflet.rotatedMarker.js"></script>
+		<script src="static/js/Chart.min.js"></script>
+		<script src="static/js/jquery-3.2.1.slim.min.js"></script>
+		<script src="static/js/popper.min.js"></script>
+		<script src="static/js/bootstrap.min.js"></script>
+		<script src="static/js/mqttws31.min.js"></script>
+		<script src="static/js/leaflet.js"></script>
+		<script src="static/js/mqtt_wrapper.js"></script>
+		<script src="static/js/leaflet.rotatedMarker.js"></script>
 		<script>
 
 			var aircraftIcon = L.icon({
-				iconUrl: 'aircraft.svg',
+				iconUrl: 'static/img/aircraft.svg',
 				iconSize:     [80, 80],
 			});
 
@@ -105,9 +131,7 @@
 
 			L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
 				maxZoom: 25,
-				attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-					'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-					'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+				attribution: '',
 				id: 'mapbox.streets'
 			}).addTo(mymap);
 

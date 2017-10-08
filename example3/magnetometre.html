@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>TraC/Ker realtime</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css">
+
+	<style>
+		#menu-bar {
+		  padding-top: 2rem;
+		  background-color: rgba(0,0,0,.03)
+		}
+
+		#menu-bar a {
+		  color: #212529;
+		}
+
+		#menu-bar a:hover {
+		  color: #868e96;
+		}
+	</style>
+</head>
+	<body>
+
+		<div class="container-fluid" id="menu-bar">
+			<ul class="nav nav-tabs justify-content-center">
+				<li class="nav-item">
+					<a class="nav-link" href="index.html">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active" href="magnetometre.html">Magnetomètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="accelerometre.html">Accéléromètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="gps.html">GPS</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="container-fluid" style="padding-top: 20px;">
+			<div class="row">
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Magnétomètre XY
+					  </div>
+					  <div class="card-body">
+						<canvas id="magxyChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Magnétomètre YZ
+					  </div>
+					  <div class="card-body">
+						<canvas id="magyzChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Magnétomètre ZX
+					  </div>
+					  <div class="card-body">
+						<canvas id="magzxChart"></canvas>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js"></script>
+		<script src="static/js/mqtt_wrapper.js"></script>
+		<script>
+
+			var ctx = document.getElementById("magxyChart").getContext('2d');
+			var magxyChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'XY',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("magyzChart").getContext('2d');
+			var magyzChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'YZ',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("magzxChart").getContext('2d');
+			var magzxChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'ZX',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			function updateInterface(data) {
+
+				/* Update Magnetometer */
+				magxyChart.data.labels.push('');
+				magxyChart.data.datasets[0].data.push(data.mag3110.xy);
+				while( magxyChart.data.labels.length > 30 )
+				{
+					magxyChart.data.labels.shift();
+					magxyChart.data.datasets[0].data.shift();
+				}
+				magxyChart.update();
+
+				magyzChart.data.labels.push('');
+				magyzChart.data.datasets[0].data.push(data.mag3110.yz);
+				while( magyzChart.data.labels.length > 30 )
+				{
+					magyzChart.data.labels.shift();
+					magyzChart.data.datasets[0].data.shift();
+				}
+				magyzChart.update();
+
+				magzxChart.data.labels.push('');
+				magzxChart.data.datasets[0].data.push(data.mag3110.zx);
+				while( magzxChart.data.labels.length > 30 )
+				{
+					magzxChart.data.labels.shift();
+					magzxChart.data.datasets[0].data.shift();
+				}
+				magzxChart.update();
+
+			}
+
+			$(document).ready(function() {
+				MQTTconnect();
+			});
+
+		</script>
+	</body>
+</html>
