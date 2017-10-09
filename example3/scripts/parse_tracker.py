@@ -4,8 +4,8 @@ import paho.mqtt.client as paho
 import json
 import sys
 
-broker="archibald.snootlab.info"
-port=2522
+broker="localhost"
+port=1883
 
 client1=paho.Client()
 client1.connect(broker,port)

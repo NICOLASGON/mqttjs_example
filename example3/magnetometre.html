@@ -176,7 +176,7 @@
 
 				/* Update Magnetometer */
 				magxyChart.data.labels.push('');
-				magxyChart.data.datasets[0].data.push(data.mag3110.xy);
+				magxyChart.data.datasets[0].data.push(data.heading.xy);
 				while( magxyChart.data.labels.length > 30 )
 				{
 					magxyChart.data.labels.shift();
@@ -185,7 +185,7 @@
 				magxyChart.update();
 
 				magyzChart.data.labels.push('');
-				magyzChart.data.datasets[0].data.push(data.mag3110.yz);
+				magyzChart.data.datasets[0].data.push(data.heading.yz);
 				while( magyzChart.data.labels.length > 30 )
 				{
 					magyzChart.data.labels.shift();
@@ -194,7 +194,7 @@
 				magyzChart.update();
 
 				magzxChart.data.labels.push('');
-				magzxChart.data.datasets[0].data.push(data.mag3110.zx);
+				magzxChart.data.datasets[0].data.push(data.heading.zx);
 				while( magzxChart.data.labels.length > 30 )
 				{
 					magzxChart.data.labels.shift();

@@ -125,7 +125,14 @@
 				iconSize:     [80, 80],
 			});
 
+			var aircraftGhostIcon = L.icon({
+				iconUrl: 'static/img/aircraft_ghost.svg',
+				iconSize:     [80, 80],
+			});
+
 			var mymap = L.map('mapid').setView([43.599553, 1.439851], 13);
+			var ghost = L.marker([51.5, -0.09], {icon: aircraftGhostIcon}).addTo(mymap);
+			ghost.setRotationOrigin('center center');
 			var tracker_marker = L.marker([51.5, -0.09], {icon: aircraftIcon}).addTo(mymap);
 			tracker_marker.setRotationOrigin('center center');
 
@@ -268,9 +275,9 @@
 
 				/* Update Magnetometer */
 				magChart.data.labels.push('');
-				magChart.data.datasets[0].data.push(data.mag3110.xy);
-				magChart.data.datasets[1].data.push(data.mag3110.yz);
-				magChart.data.datasets[2].data.push(data.mag3110.zx);
+				magChart.data.datasets[0].data.push(data.heading.xy);
+				magChart.data.datasets[1].data.push(data.heading.yz);
+				magChart.data.datasets[2].data.push(data.heading.zx);
 				while( magChart.data.labels.length > 30 )
 				{
 					magChart.data.labels.shift();
@@ -292,7 +299,9 @@
 
 				/* Update marker */
 				tracker_marker.setLatLng([ data.GPS.latitude, data.GPS.longitude ]).update();
-				tracker_marker.setRotationAngle(data.mag3110.xy);
+				tracker_marker.setRotationAngle(data.heading.xy);
+				ghost.setLatLng([ data.GPS.latitude, data.GPS.longitude ]).update();
+				ghost.setRotationAngle(data.GPS.COGT);
 
 				/* Update DOP */
 				$('#HDOP').width( data.GPS.HDOP.toString() * 10 + '%')
