@@ -47,7 +47,7 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Accéléromètre X
+						Acc X
 					  </div>
 					  <div class="card-body">
 						<canvas id="accxChart"></canvas>
@@ -57,7 +57,7 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Accéléromètre Y
+						Acc Y
 					  </div>
 					  <div class="card-body">
 						<canvas id="accyChart"></canvas>
@@ -67,7 +67,7 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Accéléromètre Z
+						Acc Z
 					  </div>
 					  <div class="card-body">
 						<canvas id="acczChart"></canvas>
@@ -79,30 +79,62 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Gravité XY
+						Acc. X
 					  </div>
 					  <div class="card-body">
-						<canvas id="accxyChart"></canvas>
+						<canvas id="acc1xChart"></canvas>
 					  </div>
 					</div>
 				</div>
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Gravité YZ
+						Acc. Y
 					  </div>
 					  <div class="card-body">
-						<canvas id="accyzChart"></canvas>
+						<canvas id="acc1yChart"></canvas>
 					  </div>
 					</div>
 				</div>
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Gravité ZX
+						Acc. Z
 					  </div>
 					  <div class="card-body">
-						<canvas id="acczxChart"></canvas>
+						<canvas id="acc1zChart"></canvas>
+					  </div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="padding-top: 20px;">
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Acc.. X
+					  </div>
+					  <div class="card-body">
+						<canvas id="acc2xChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Acc.. Y
+					  </div>
+					  <div class="card-body">
+						<canvas id="acc2yChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Acc.. Z
+					  </div>
+					  <div class="card-body">
+						<canvas id="acc2zChart"></canvas>
 					  </div>
 					</div>
 				</div>
@@ -204,8 +236,8 @@
 				}
 			});
 
-			var ctx = document.getElementById("accxyChart").getContext('2d');
-			var accxyChart = new Chart(ctx, {
+			var ctx = document.getElementById("acc1xChart").getContext('2d');
+			var acc1xChart = new Chart(ctx, {
 				type: 'line',
 				data: {
 					labels: [],
@@ -233,8 +265,8 @@
 				}
 			});
 
-			var ctx = document.getElementById("accyzChart").getContext('2d');
-			var accyzChart = new Chart(ctx, {
+			var ctx = document.getElementById("acc1yChart").getContext('2d');
+			var acc1yChart = new Chart(ctx, {
 				type: 'line',
 				data: {
 					labels: [],
@@ -262,8 +294,95 @@
 				}
 			});
 
-			var ctx = document.getElementById("acczxChart").getContext('2d');
-			var acczxChart = new Chart(ctx, {
+			var ctx = document.getElementById("acc1zChart").getContext('2d');
+			var acc1zChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'ZX',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -100,
+								suggestedMax: 100,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("acc2xChart").getContext('2d');
+			var acc2xChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'XY',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -100,
+								suggestedMax: 100,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("acc2yChart").getContext('2d');
+			var acc2yChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'YZ',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -100,
+								suggestedMax: 100,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'degrés'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("acc2zChart").getContext('2d');
+			var acc2zChart = new Chart(ctx, {
 				type: 'line',
 				data: {
 					labels: [],
@@ -295,7 +414,7 @@
 
 				/* Update Accelerometer */
 				accxChart.data.labels.push('');
-				accxChart.data.datasets[0].data.push(data.adxl362.x);
+				accxChart.data.datasets[0].data.push(data.x);
 				while( accxChart.data.labels.length > 30 )
 				{
 					accxChart.data.labels.shift();
@@ -304,7 +423,7 @@
 				accxChart.update();
 
 				accyChart.data.labels.push('');
-				accyChart.data.datasets[0].data.push(data.adxl362.y);
+				accyChart.data.datasets[0].data.push(data.y);
 				while( accyChart.data.labels.length > 30 )
 				{
 					accyChart.data.labels.shift();
@@ -313,7 +432,7 @@
 				accyChart.update();
 
 				acczChart.data.labels.push('');
-				acczChart.data.datasets[0].data.push(data.adxl362.z);
+				acczChart.data.datasets[0].data.push(data.z);
 				while( acczChart.data.labels.length > 30 )
 				{
 					acczChart.data.labels.shift();
@@ -321,34 +440,61 @@
 				}
 				acczChart.update();
 
-				/* Update Gravité */
-				accxyChart.data.labels.push('');
-				accxyChart.data.datasets[0].data.push(data.gravity.xy);
-				while( accxyChart.data.labels.length > 30 )
+				/* Update Accelerometer 1 */
+				acc1xChart.data.labels.push('');
+				acc1xChart.data.datasets[0].data.push(data.x1);
+				while( acc1xChart.data.labels.length > 30 )
 				{
-					accxyChart.data.labels.shift();
-					accxyChart.data.datasets[0].data.shift();
+					acc1xChart.data.labels.shift();
+					acc1xChart.data.datasets[0].data.shift();
 				}
-				accxyChart.update();
+				acc1xChart.update();
 
-				accyzChart.data.labels.push('');
-				accyzChart.data.datasets[0].data.push(data.gravity.yz);
-				while( accyzChart.data.labels.length > 30 )
+				acc1yChart.data.labels.push('');
+				acc1yChart.data.datasets[0].data.push(data.y1);
+				while( acc1yChart.data.labels.length > 30 )
 				{
-					accyzChart.data.labels.shift();
-					accyzChart.data.datasets[0].data.shift();
+					acc1yChart.data.labels.shift();
+					acc1yChart.data.datasets[0].data.shift();
 				}
-				accyzChart.update();
+				acc1yChart.update();
 
-				acczxChart.data.labels.push('');
-				acczxChart.data.datasets[0].data.push(data.gravity.zx);
-				while( acczxChart.data.labels.length > 30 )
+				acc1zChart.data.labels.push('');
+				acc1zChart.data.datasets[0].data.push(data.z1);
+				while( acc1zChart.data.labels.length > 30 )
 				{
-					acczxChart.data.labels.shift();
-					acczxChart.data.datasets[0].data.shift();
+					acc1zChart.data.labels.shift();
+					acc1zChart.data.datasets[0].data.shift();
 				}
-				acczxChart.update();
+				acc1zChart.update();
 
+				/* Update Accelerometer 2 */
+				acc2xChart.data.labels.push('');
+				acc2xChart.data.datasets[0].data.push(data.x2);
+				while( acc2xChart.data.labels.length > 30 )
+				{
+					acc2xChart.data.labels.shift();
+					acc2xChart.data.datasets[0].data.shift();
+				}
+				acc2xChart.update();
+
+				acc2yChart.data.labels.push('');
+				acc2yChart.data.datasets[0].data.push(data.y2);
+				while( acc2yChart.data.labels.length > 30 )
+				{
+					acc2yChart.data.labels.shift();
+					acc2yChart.data.datasets[0].data.shift();
+				}
+				acc2yChart.update();
+
+				acc2zChart.data.labels.push('');
+				acc2zChart.data.datasets[0].data.push(data.z2);
+				while( acc2zChart.data.labels.length > 30 )
+				{
+					acc2zChart.data.labels.shift();
+					acc2zChart.data.datasets[0].data.shift();
+				}
+				acc2zChart.update();
 			}
 
 			$(document).ready(function() {

@@ -47,7 +47,39 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Magnétomètre XY
+						Magnétomètre X
+					  </div>
+					  <div class="card-body">
+						<canvas id="magxChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Magnétomètre Y
+					  </div>
+					  <div class="card-body">
+						<canvas id="magyChart"></canvas>
+					  </div>
+					</div>
+				</div>
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Magnétomètre Z
+					  </div>
+					  <div class="card-body">
+						<canvas id="magzChart"></canvas>
+					  </div>
+					</div>
+				</div>
+			</div>
+			<div class="row" style="padding-top: 20px;">
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Heading XY
 					  </div>
 					  <div class="card-body">
 						<canvas id="magxyChart"></canvas>
@@ -57,7 +89,7 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Magnétomètre YZ
+						Heading YZ
 					  </div>
 					  <div class="card-body">
 						<canvas id="magyzChart"></canvas>
@@ -67,7 +99,7 @@
 				<div class="col-4">
 					<div class="card">
 					  <div class="card-header">
-						Magnétomètre ZX
+						Heading ZX
 					  </div>
 					  <div class="card-body">
 						<canvas id="magzxChart"></canvas>
@@ -172,6 +204,93 @@
 				}
 			});
 
+			var ctx = document.getElementById("magxChart").getContext('2d');
+			var magxChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'X',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'uT'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("magyChart").getContext('2d');
+			var magyChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'Y',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'uT'
+							}
+						}]
+					},
+				}
+			});
+
+			var ctx = document.getElementById("magzChart").getContext('2d');
+			var magzChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: [],
+					datasets: [{
+						label: 'Z',
+						data: [],
+						backgroundColor: 'rgba(255, 159, 64, 0.2)',
+						borderColor: 'rgba(255, 159, 64, 1)',
+						borderWidth: 1
+					}]
+				},
+				options: {
+					scales: {
+						yAxes: [{
+							ticks: {
+								suggestedMin: -180,
+								suggestedMax: 180,
+							},
+							scaleLabel: {
+								display: true,
+								labelString: 'uT'
+							}
+						}]
+					},
+				}
+			});
+
 			function updateInterface(data) {
 
 				/* Update Magnetometer */
@@ -202,6 +321,33 @@
 				}
 				magzxChart.update();
 
+				/* Update Heading */
+				magxChart.data.labels.push('');
+				magxChart.data.datasets[0].data.push(data.adxl362.x);
+				while( magxChart.data.labels.length > 30 )
+				{
+					magxChart.data.labels.shift();
+					magxChart.data.datasets[0].data.shift();
+				}
+				magxChart.update();
+
+				magyChart.data.labels.push('');
+				magyChart.data.datasets[0].data.push(data.adxl362.y);
+				while( magyChart.data.labels.length > 30 )
+				{
+					magyChart.data.labels.shift();
+					magyChart.data.datasets[0].data.shift();
+				}
+				magyChart.update();
+
+				magzChart.data.labels.push('');
+				magzChart.data.datasets[0].data.push(data.adxl362.z);
+				while( magzChart.data.labels.length > 30 )
+				{
+					magzChart.data.labels.shift();
+					magzChart.data.datasets[0].data.shift();
+				}
+				magzChart.update();
 			}
 
 			$(document).ready(function() {
