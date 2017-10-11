@@ -135,6 +135,8 @@
 
 			var vector_body_geometry;
 			var sphere;
+			var camera;
+			var renderer;
 
 			var ctx = document.getElementById("accxChart").getContext('2d');
 			var accxChart = new Chart(ctx, {
@@ -368,13 +370,14 @@
 				}
 				acczxChart.update();
 
-				vector_body_geometry.vertices[1].x = data.x;
-				vector_body_geometry.vertices[1].y = data.y;
-				vector_body_geometry.vertices[1].z = data.z;
+				console.log(data.adxl362.x);
+				vector_body_geometry.vertices[1].x = data.adxl362.x;
+				vector_body_geometry.vertices[1].y = data.adxl362.y;
+				vector_body_geometry.vertices[1].z = data.adxl362.z;
 				vector_body_geometry.verticesNeedUpdate = true;
-				sphere.position.x = data.x;
-				sphere.position.y = data.y;
-				sphere.position.z = data.z;
+				sphere.position.x = data.adxl362.x;
+				sphere.position.y = data.adxl362.y;
+				sphere.position.z = data.adxl362.z;
 			}
 
 			function init()
@@ -382,8 +385,8 @@
 				var clock = new THREE.Clock();
 
 				var scene = new THREE.Scene();
-				var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-				var renderer = new THREE.WebGLRenderer();
+				camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor(new THREE.Color(0xEEEEEE));
 				renderer.setSize(window.innerWidth, window.innerHeight);
 				var axes = new THREE.AxisHelper(20);
@@ -418,7 +421,7 @@
 				camera.position.z = 20;
 				camera.lookAt(scene.position);
 
-				renderer.setSize($(container).width(), 300);
+				renderer.setSize($(container).width()-5, 300);
 				container.appendChild(renderer.domElement);
 				renderScene();
 
@@ -430,6 +433,12 @@
 					renderer.render(scene, camera);
 				}
 			}
+
+			window.addEventListener( 'resize', function () {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize($(container).width(), 300);
+			}, false );
 
 			$(document).ready(function() {
 				init();

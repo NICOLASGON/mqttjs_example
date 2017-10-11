@@ -1,8 +1,8 @@
 var mqtt;
 var reconnectTimeout = 2000;
 
-var host = "localhost";
-var port = 1882;
+var host = "archibald.snootlab.info";
+var port = 2523;
 var path = "/ws";
 var topic = "testing/";
 
