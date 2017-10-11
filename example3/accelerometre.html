@@ -109,13 +109,32 @@
 			</div>
 		</div>
 
+		<div class="container-fluid" style="padding-top: 20px;">
+			<div class="row">
+				<div class="col-4">
+					<div class="card">
+					  <div class="card-header">
+						Vecteur gravité
+					  </div>
+					  <div class="card-body" style="padding: 0px;">
+						<div id="WebGL-output"></div>
+					  </div>
+					</div>
+				</div>
+		</div>
+
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js"></script>
+		<script type="text/javascript" src="static/js/three.min.js"></script>
+		<script type="text/javascript" src="static/js/TrackballControls.js"></script>
 		<script src="static/js/mqtt_wrapper.js"></script>
 		<script>
+
+			var vector_body_geometry;
+			var sphere;
 
 			var ctx = document.getElementById("accxChart").getContext('2d');
 			var accxChart = new Chart(ctx, {
@@ -349,9 +368,71 @@
 				}
 				acczxChart.update();
 
+				vector_body_geometry.vertices[1].x = data.x;
+				vector_body_geometry.vertices[1].y = data.y;
+				vector_body_geometry.vertices[1].z = data.z;
+				vector_body_geometry.verticesNeedUpdate = true;
+				sphere.position.x = data.x;
+				sphere.position.y = data.y;
+				sphere.position.z = data.z;
+			}
+
+			function init()
+			{
+				var clock = new THREE.Clock();
+
+				var scene = new THREE.Scene();
+				var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+				var renderer = new THREE.WebGLRenderer();
+				renderer.setClearColor(new THREE.Color(0xEEEEEE));
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				var axes = new THREE.AxisHelper(20);
+				scene.add(axes);
+
+				var material = new THREE.LineBasicMaterial({
+					color: 0x000000,
+					linewidth: 3,
+				});
+				vector_body_geometry = new THREE.Geometry();
+				vector_body_geometry.vertices.push(new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -10, 0 ));
+				var vector_body = new THREE.Line( vector_body_geometry, material );
+				scene.add( vector_body );
+
+				var sphereGeometry = new THREE.SphereGeometry(0.4, 30, 30);
+				var sphereMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
+				sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				sphere.position.x = 0;
+				sphere.position.y = -10;
+				sphere.position.z = 0;
+				scene.add(sphere);
+
+				container = document.getElementById("WebGL-output")
+				var trackballControls = new THREE.TrackballControls(camera, container);
+				trackballControls.rotateSpeed = 1.0;
+				trackballControls.zoomSpeed = 1.0;
+				trackballControls.panSpeed = 1.0;
+				trackballControls.staticMoving = true;
+
+				camera.position.x = -10;
+				camera.position.y = 20;
+				camera.position.z = 20;
+				camera.lookAt(scene.position);
+
+				renderer.setSize($(container).width(), 300);
+				container.appendChild(renderer.domElement);
+				renderScene();
+
+				function renderScene()
+				{
+					var delta = clock.getDelta();
+					trackballControls.update(delta);
+					requestAnimationFrame(renderScene);
+					renderer.render(scene, camera);
+				}
 			}
 
 			$(document).ready(function() {
+				init();
 				MQTTconnect();
 			});
 
