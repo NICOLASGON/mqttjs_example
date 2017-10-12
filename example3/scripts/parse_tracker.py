@@ -4,8 +4,8 @@ import paho.mqtt.client as paho
 import json
 import sys
 
-broker="localhost"
-port=1883
+broker="archibald.snootlab.info"
+port=2522
 
 client1=paho.Client()
 client1.connect(broker,port)
@@ -17,3 +17,4 @@ for line in sys.stdin:
         client1.publish("testing/", json.dumps(data))
     except:
         pass
+

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>TraC/Ker realtime</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css">
+
+	<style>
+		#menu-bar {
+		  padding-top: 2rem;
+		  background-color: rgba(0,0,0,.03)
+		}
+
+		#menu-bar a {
+		  color: #212529;
+		}
+
+		#menu-bar a:hover {
+		  color: #868e96;
+		}
+	</style>
+</head>
+	<body>
+
+		<div class="container-fluid" id="menu-bar">
+			<ul class="nav nav-tabs justify-content-center">
+				<li class="nav-item">
+					<a class="nav-link" href="index.html">Dashboard</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="magnetometre.html">Magnetomètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="accelerometre.html">Accéléromètre</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="gps.html">GPS</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link active" href="vectors.html">Vectors</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="container-fluid" style="padding-top: 20px;">
+			<div class="row">
+				<div class="col-6">
+					<div class="card">
+					  <div class="card-header">
+						Vecteur gravité
+					  </div>
+					  <div class="card-body" style="padding: 0px;">
+						<div id="WebGL-gravity"></div>
+					  </div>
+					</div>
+				</div>
+				<div class="col-6">
+					<div class="card">
+					  <div class="card-header">
+						Vecteur heading
+					  </div>
+					  <div class="card-body" style="padding: 0px;">
+						<div id="WebGL-heading"></div>
+					  </div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.2/mqttws31.min.js"></script>
+		<script type="text/javascript" src="static/js/three.min.js"></script>
+		<script type="text/javascript" src="static/js/TrackballControls.js"></script>
+		<script src="static/js/mqtt_wrapper.js"></script>
+		<script>
+
+			var vector_gravity_geometry;
+			var gravity_sphere;
+			var gravity_camera;
+			var gravity_renderer;
+			var gravity_container;
+
+			var vector_heading_geometry;
+			var heading_sphere;
+			var heading_camera;
+			var heading_renderer;
+			var heading_container;
+
+			function updateInterface(data) {
+				vector_gravity_geometry.vertices[1].x = -data.adxl362.x / 100;
+				vector_gravity_geometry.vertices[1].y = -data.adxl362.y / 100;
+				vector_gravity_geometry.vertices[1].z = -data.adxl362.z / 100;
+				vector_gravity_geometry.verticesNeedUpdate = true;
+				gravity_sphere.position.x = -data.adxl362.x / 100;
+				gravity_sphere.position.y = -data.adxl362.y / 100;
+				gravity_sphere.position.z = -data.adxl362.z / 100;
+
+				vector_heading_geometry.vertices[1].x = data.mag3110.x / 10;
+				vector_heading_geometry.vertices[1].y = data.mag3110.y / 10;
+				vector_heading_geometry.vertices[1].z = data.mag3110.z / 10;
+				vector_heading_geometry.verticesNeedUpdate = true;
+				heading_sphere.position.x = data.mag3110.x / 10;
+				heading_sphere.position.y = data.mag3110.y / 10;
+				heading_sphere.position.z = data.mag3110.z / 10;
+			}
+
+			function init_gravity()
+			{
+				var clock = new THREE.Clock();
+
+				var scene = new THREE.Scene();
+				gravity_camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+				gravity_renderer = new THREE.WebGLRenderer();
+				gravity_renderer.setClearColor(new THREE.Color(0xEEEEEE));
+				gravity_renderer.setSize(window.innerWidth, window.innerHeight);
+				var axes = new THREE.AxisHelper(20);
+				scene.add(axes);
+
+				var material = new THREE.LineBasicMaterial({
+					color: 0x000000,
+					linewidth: 3,
+				});
+				vector_gravity_geometry = new THREE.Geometry();
+				vector_gravity_geometry.vertices.push(new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -10, 0 ));
+				var vector_body = new THREE.Line( vector_gravity_geometry, material );
+				scene.add( vector_body );
+
+				var gravity_sphereGeometry = new THREE.SphereGeometry(0.4, 30, 30);
+				var gravity_sphereMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
+				gravity_sphere = new THREE.Mesh(gravity_sphereGeometry, gravity_sphereMaterial);
+				gravity_sphere.position.x = 0;
+				gravity_sphere.position.y = -10;
+				gravity_sphere.position.z = 0;
+				scene.add(gravity_sphere);
+
+				gravity_container = document.getElementById("WebGL-gravity")
+				var trackballControls = new THREE.TrackballControls(gravity_camera, gravity_container);
+				trackballControls.rotateSpeed = 1.0;
+				trackballControls.zoomSpeed = 1.0;
+				trackballControls.panSpeed = 1.0;
+				trackballControls.staticMoving = true;
+
+				gravity_camera.position.x = -10;
+				gravity_camera.position.y = 20;
+				gravity_camera.position.z = 20;
+				gravity_camera.lookAt(scene.position);
+
+				gravity_renderer.setSize($(gravity_container).width(), 500);
+				gravity_container.appendChild(gravity_renderer.domElement);
+				renderScene();
+
+				function renderScene()
+				{
+					var delta = clock.getDelta();
+					trackballControls.update(delta);
+					requestAnimationFrame(renderScene);
+					gravity_renderer.render(scene, gravity_camera);
+				}
+			}
+
+			function init_heading()
+			{
+				var clock = new THREE.Clock();
+
+				var scene = new THREE.Scene();
+				heading_camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+				heading_renderer = new THREE.WebGLRenderer();
+				heading_renderer.setClearColor(new THREE.Color(0xEEEEEE));
+				heading_renderer.setSize(window.innerWidth, window.innerHeight);
+				var axes = new THREE.AxisHelper(20);
+				scene.add(axes);
+
+				var material = new THREE.LineBasicMaterial({
+					color: 0x000000,
+					linewidth: 3,
+				});
+				vector_heading_geometry = new THREE.Geometry();
+				vector_heading_geometry.vertices.push(new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -10, 0 ));
+				var vector_body = new THREE.Line( vector_heading_geometry, material );
+				scene.add( vector_body );
+
+				var heading_sphereGeometry = new THREE.SphereGeometry(0.4, 30, 30);
+				var heading_sphereMaterial = new THREE.MeshBasicMaterial({color: 0x000000});
+				heading_sphere = new THREE.Mesh(heading_sphereGeometry, heading_sphereMaterial);
+				heading_sphere.position.x = 0;
+				heading_sphere.position.y = -10;
+				heading_sphere.position.z = 0;
+				scene.add(heading_sphere);
+
+				heading_container = document.getElementById("WebGL-heading")
+				var trackballControls = new THREE.TrackballControls(heading_camera, heading_container);
+				trackballControls.rotateSpeed = 1.0;
+				trackballControls.zoomSpeed = 1.0;
+				trackballControls.panSpeed = 1.0;
+				trackballControls.staticMoving = true;
+
+				heading_camera.position.x = -10;
+				heading_camera.position.y = 20;
+				heading_camera.position.z = 20;
+				heading_camera.lookAt(scene.position);
+
+				heading_renderer.setSize($(heading_container).width(), 500);
+				heading_container.appendChild(heading_renderer.domElement);
+				renderScene();
+
+				function renderScene()
+				{
+					var delta = clock.getDelta();
+					trackballControls.update(delta);
+					requestAnimationFrame(renderScene);
+					heading_renderer.render(scene, heading_camera);
+				}
+			}
+
+			window.addEventListener( 'resize', function () {
+				gravity_camera.aspect = window.innerWidth / window.innerHeight;
+				gravity_camera.updateProjectionMatrix();
+				gravity_renderer.setSize($(gravity_container).width(), 500);
+				
+				heading_camera.aspect = window.innerWidth / window.innerHeight;
+				heading_camera.updateProjectionMatrix();
+				heading_renderer.setSize($(heading_container).width(), 500);
+			}, false );
+
+			$(document).ready(function() {
+				init_gravity();
+				init_heading();
+				MQTTconnect();
+			});
+
+		</script>
+	</body>
+</html>
